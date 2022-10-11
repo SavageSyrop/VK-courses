@@ -10,8 +10,6 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor("org.projectlombok:lombok:1.18.22")
-    implementation("org.projectlombok:lombok:1.18.22")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation(project(":models"))
 }

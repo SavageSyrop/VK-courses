@@ -9,8 +9,5 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("org.projectlombok:lombok:1.18.22")
-    annotationProcessor("org.projectlombok:lombok:1.18.22")
-}
+
 

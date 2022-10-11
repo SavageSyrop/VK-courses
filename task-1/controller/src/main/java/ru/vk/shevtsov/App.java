@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
+import java.util.Scanner;
 
 
 public class App {
@@ -16,6 +17,9 @@ public class App {
 
         LibraryFactory libraryFactory = new LibraryFactory(gson);
         Library library = libraryFactory.getLibrary();
-        System.out.println(gson.toJson(library.getBooksByAuthor(args[0])));
+        System.out.print("Enter authors name: ");
+        Scanner sc = new Scanner(System.in);
+        String authorName = sc.nextLine();
+        System.out.println(gson.toJson(library.getBooksByAuthor(authorName)));
     }
 }

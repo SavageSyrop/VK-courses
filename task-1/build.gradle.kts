@@ -9,7 +9,13 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    implementation("com.intellij:annotations:12.0")
+subprojects {
+    apply(plugin = "java")
+    dependencies {
+        compileOnly("org.projectlombok:lombok:1.18.22")
+        annotationProcessor("org.projectlombok:lombok:1.18.22")
+        implementation("com.intellij:annotations:12.0")
+    }
 }
+
 
