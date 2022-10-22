@@ -1,0 +1,46 @@
+{
+    "authors": [
+    {
+        "id": "1",
+        "name": "Fedor Dostoevsky",
+        "bornDate": "11.11.1821",
+        "deathDate": "09.02.1881"
+    },
+    {
+        "id": "2",
+        "name": "Dante Alighieri",
+        "bornDate": "01.01.1265",
+        "deathDate": "14.09.1321"
+    }
+    ],
+    "books":[
+    {
+        "id": "1",
+        "name": "Crime and Punishment",
+        "authorId": "1",
+        "firstPublishedYear": "1866",
+        "language": "Deutsch"
+    },
+    {
+        "id": "2",
+        "name": "Divine Comedy",
+        "authorId": "2",
+        "firstPublishedYear": "1320",
+        "language": "English"
+    },
+    {
+            "id": "3",
+            "name": "Crime and Punishment",
+            "authorId": "1",
+            "firstPublishedYear": "1866",
+            "language": "Russian"
+    },
+    {
+            "id": "4",
+            "name": "Humiliated and Insulted",
+            "authorId": "1",
+            "firstPublishedYear": "1861",
+            "language": "Russian"
+    }
+    ]
+}
