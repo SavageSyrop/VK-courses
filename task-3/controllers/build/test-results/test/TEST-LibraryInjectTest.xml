@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="LibraryInjectTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2022-10-30T13:54:53" hostname="DESKTOP-RGGTMQN" time="1.616">
+  <properties/>
+  <testcase name="takeBook_WhenBookShellIsEmpty_ThenThrowsEmptyShellException()" classname="LibraryInjectTest" time="1.57"/>
+  <testcase name="putBook_WhenFirstEmptyShellFound_ThenPutBookInThisShell()" classname="LibraryInjectTest" time="0.023"/>
+  <testcase name="putBook_WhenNoEmptyShells_ThenThrowsShellTooSmallException()" classname="LibraryInjectTest" time="0.017"/>
+  <system-out><![CDATA[{
+  "id": 3,
+  "name": "Gone with the wind",
+  "author": {
+    "id": 3,
+    "name": "Margaret Mitchell"
+  }
+}
+ Was at book shell with index 2
+{
+  "id": 4,
+  "name": "Anna Karenina",
+  "author": {
+    "id": 2,
+    "name": "Lev Tolstoy"
+  }
+}
+ Was at book shell with index 3
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
