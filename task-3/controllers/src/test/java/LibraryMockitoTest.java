@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ru.vk.Book;
 import ru.vk.Library;
-import ru.vk.exceptions.ShellTooSmallException;
+import ru.vk.exceptions.EmptyShelfException;
+import ru.vk.exceptions.ShelfTooSmallException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +15,7 @@ class LibraryMockitoTest extends AbstractTest {
 
     @BeforeEach
     public void mockBookList() {
-        Mockito.when(mockedFileBookFactory.books()).thenReturn(mockedBooks.values());
+        Mockito.when(mockedFileBookFactory.books()).thenReturn(books.values());
         System.setOut(systemOut);
     }
 
@@ -28,48 +29,50 @@ class LibraryMockitoTest extends AbstractTest {
 
 
     @Test
-    public void library_WhenCapacityLessThanBookCountInFile_ThenThrowsShellTooSmallException() {
-        assertThrows(ShellTooSmallException.class, () -> mockedLibraryFactory.library(mockedBooks.size() - 1));
+    public void whenCapacityIsLesserThanReceivedBookCountThenThrowException() {
+        assertThrows(ShelfTooSmallException.class, () -> mockedLibraryFactory.library(books.size() - 1));
     }
 
     @Test
-    public void library_WhenCapacityIsGreaterThanBookCountInFile_ThenSortedAsInFileAndHasEmptyShells() {
-        Library libraryWithOneEmptyShell = mockedLibraryFactory.library(mockedBooks.size() + 1);
-        for (int i = 0; i < mockedBooks.size(); i++) {
-            assertEquals(mockedBooks.get(i), libraryWithOneEmptyShell.getBooks().get(i));
+    public void checkBooksOrderEqualToFile() {
+        Library libraryWithOneEmptyShell = mockedLibraryFactory.library(books.size() + 1);
+        for (int i = 0; i < books.size(); i++) {
+            assertEquals(books.get(i), libraryWithOneEmptyShell.getBooks().get(i));
         }
-        assertNull(libraryWithOneEmptyShell.getBooks().get(mockedBooks.size() + 1));
-        assertNull(mockedBooks.get(mockedBooks.size() + 1));
+        assertNull(libraryWithOneEmptyShell.getBooks().get(books.size() + 1));
+        assertNull(books.get(books.size() + 1));
     }
 
 
     @Test
-    public void takeBook_WhenShellContainsBookByIndex_ThenPrintInConsole() {
-        String line = new GsonBuilder().setPrettyPrinting().create().toJson(mockedBooks.get(0)) + "\n Was at book shell with index 0";
+    public void takenBookAndShelfIndexInfoPrintsInConsole() {
+        String line = new GsonBuilder().setPrettyPrinting().create().toJson(books.get(0)) + "\n Was at book shell with index 0";
         doAnswer(invocation -> {
             String str = invocation.getArgument(0);
             assertEquals(str, line);
             return null;
         }).when(systemOut).println(any(String.class));
-        mockedLibraryFactory.library(mockedBooks.size()).takeBook(0);
+        mockedLibraryFactory.library(books.size()).takeBook(0);
     }
 
     @Test
-    public void takeBook_WhennShellContainsBookByIndex_ThenReturnThatBook() {
-        Book book = mockedBooks.get(0);
-        assertEquals(mockedLibraryFactory.library(mockedBooks.size()).takeBook(0), book);
+    public void takenBookReturnsCorrectlyAndShelfBecomesEmpty() {
+        Book book = books.get(0);
+        Library library = mockedLibraryFactory.library(books.size());
+        assertEquals(library.takeBook(0), book);
+        assertThrows(EmptyShelfException.class, () -> library.takeBook(0));
     }
 
 
     @Test
-    public void printBooks_WhenCorrectData_ThenPrintInConsole() {
-        String line = new GsonBuilder().setPrettyPrinting().create().toJson(mockedBooks);
+    public void testAllBooksFromShelfsPrintedInConsole() {
+        String line = new GsonBuilder().setPrettyPrinting().create().toJson(books);
 
         doAnswer(invocation -> {
             String str = invocation.getArgument(0);
             assertEquals(str, line);
             return null;
         }).when(systemOut).println(any(String.class));
-        mockedLibraryFactory.library(mockedBooks.size()).printBooks();
+        mockedLibraryFactory.library(books.size()).printBooks();
     }
 }

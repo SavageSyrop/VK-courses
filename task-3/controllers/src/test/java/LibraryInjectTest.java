@@ -3,8 +3,8 @@ import com.google.inject.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.vk.*;
-import ru.vk.exceptions.EmptyShellException;
-import ru.vk.exceptions.ShellTooSmallException;
+import ru.vk.exceptions.EmptyShelfException;
+import ru.vk.exceptions.ShelfTooSmallException;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -24,13 +24,13 @@ public class LibraryInjectTest extends AbstractTest {
     }
 
     @Test
-    public void takeBook_WhenBookShellIsEmpty_ThenThrowsEmptyShellException() {
+    public void whenBookIsTakenFromEmptyShelfThenThrowException() {
         Library library = libraryFactory.library(injectedBookFactory.books().size() + 1);
-        assertThrows(EmptyShellException.class, () -> library.takeBook(injectedBookFactory.books().size() + 1));
+        assertThrows(EmptyShelfException.class, () -> library.takeBook(injectedBookFactory.books().size() + 1));
     }
 
     @Test
-    public void putBook_WhenFirstEmptyShellFound_ThenPutBookInThisShell() {
+    public void bookAddsAtFirstEmptyShelfIndex() {
         Library library = libraryFactory.library(injectedBookFactory.books().size() + 1);
         library.takeBook(2);
         Book bookFromShellThree = library.takeBook(3);
@@ -42,9 +42,9 @@ public class LibraryInjectTest extends AbstractTest {
     }
 
     @Test
-    public void putBook_WhenNoEmptyShells_ThenThrowsShellTooSmallException() {
+    public void shelfSizeIsLesserThanCountOfBooksThenThrowException() {
         Author kanyeWest = new Author(4L, "Kanye West");
         Library library = libraryFactory.library(injectedBookFactory.books().size());
-        assertThrows(ShellTooSmallException.class, () -> library.putBook(new Book(6L, "Genius", kanyeWest)));
+        assertThrows(ShelfTooSmallException.class, () -> library.putBook(new Book(6L, "Genius", kanyeWest)));
     }
 }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="LibraryMockitoTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2022-10-30T13:54:55" hostname="DESKTOP-RGGTMQN" time="0.116">
+<testsuite name="LibraryMockitoTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2022-10-31T10:43:48" hostname="DESKTOP-RGGTMQN" time="0.158">
   <properties/>
-  <testcase name="library_WhenCapacityIsGreaterThanBookCountInFile_ThenSortedAsInFileAndHasEmptyShells()" classname="LibraryMockitoTest" time="0.048"/>
-  <testcase name="printBooks_WhenCorrectData_ThenPrintInConsole()" classname="LibraryMockitoTest" time="0.016"/>
-  <testcase name="takeBook_WhennShellContainsBookByIndex_ThenReturnThatBook()" classname="LibraryMockitoTest" time="0.007"/>
-  <testcase name="takeBook_WhenShellContainsBookByIndex_ThenPrintInConsole()" classname="LibraryMockitoTest" time="0.013"/>
-  <testcase name="library_WhenCapacityLessThanBookCountInFile_ThenThrowsShellTooSmallException()" classname="LibraryMockitoTest" time="0.016"/>
+  <testcase name="takenBookAndShelfIndexInfoPrintsInConsole()" classname="LibraryMockitoTest" time="0.101"/>
+  <testcase name="whenCapacityIsLesserThanReceivedBookCountThenThrowException()" classname="LibraryMockitoTest" time="0.008"/>
+  <testcase name="testAllBooksFromShelfsPrintedInConsole()" classname="LibraryMockitoTest" time="0.02"/>
+  <testcase name="checkBooksOrderEqualToFile()" classname="LibraryMockitoTest" time="0.009"/>
+  <testcase name="takenBookReturnsCorrectlyAndShelfBecomesEmpty()" classname="LibraryMockitoTest" time="0.011"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

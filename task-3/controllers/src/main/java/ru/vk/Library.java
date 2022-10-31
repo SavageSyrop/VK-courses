@@ -4,36 +4,39 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
 import lombok.Getter;
-import ru.vk.exceptions.EmptyShellException;
-import ru.vk.exceptions.ShellTooSmallException;
+import ru.vk.exceptions.EmptyShelfException;
+import ru.vk.exceptions.ShelfTooSmallException;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public final class Library {
 
-    private final BooksFactory booksFactory;
-
     @Getter
     private Map<Integer, Book> books;
 
-    private final Integer shellMaxSize;
+    @Getter
+    private SortedSet<Integer> emptyIndexes;
+
+    private final Integer shelfMaxSize;
 
     @Inject
-    public Library(Integer shellMaxSize, BooksFactory booksFactory) {
-        this.shellMaxSize = shellMaxSize;
-        this.booksFactory = booksFactory;
+    public Library(Integer shelfMaxSize, BooksFactory booksFactory) {
+        this.shelfMaxSize = shelfMaxSize;
         Collection<Book> booksFromFile = booksFactory.books();
-        if (booksFromFile.size() > shellMaxSize) {
-            throw new ShellTooSmallException(shellMaxSize, booksFromFile.size());
+        if (booksFromFile.size() > shelfMaxSize) {
+            throw new ShelfTooSmallException(shelfMaxSize, booksFromFile.size());
         }
         this.books = new HashMap<>();
         Integer cellCount = 0;
         for (Book book : booksFromFile) {
             books.put(cellCount, book);
             cellCount++;
+        }
+
+        this.emptyIndexes = new TreeSet<>();
+        for (int i = books.size(); i< shelfMaxSize; i++) {
+            emptyIndexes.add(i);
         }
     }
 
@@ -45,9 +48,10 @@ public final class Library {
 
     public Book takeBook(int shellIndex) {
         if (books.get(shellIndex) == null) {
-            throw new EmptyShellException(shellIndex);
+            throw new EmptyShelfException(shellIndex);
         }
         Book book = books.remove(shellIndex);
+        emptyIndexes.add(shellIndex);
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.setPrettyPrinting().create();
         System.out.println(gson.toJson(book) + "\n Was at book shell with index " + shellIndex);
@@ -55,16 +59,16 @@ public final class Library {
     }
 
     public Integer putBook(Book book) {
-        if (shellMaxSize == books.size()) {
-            throw new ShellTooSmallException(shellMaxSize, shellMaxSize + 1);
+        if (shelfMaxSize == books.size()) {
+            throw new ShelfTooSmallException(shelfMaxSize, shelfMaxSize + 1);
         }
-
-        for (Integer i = 0; i < shellMaxSize; i++) {
-            if (books.get(i) == null) {
-                books.put(i, book);
-                return i;
-            }
+        try {
+            Integer nearestIndex = emptyIndexes.first();
+            books.put(nearestIndex, book);
+            emptyIndexes.remove(nearestIndex);
+            return nearestIndex;
+        } catch (NoSuchElementException e) {
+            return null;
         }
-        return null;
     }
 }

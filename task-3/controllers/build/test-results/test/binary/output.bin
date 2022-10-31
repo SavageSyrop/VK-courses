@@ -1,18 +1,18 @@
-{
-  "id": 3,
-   "name": "Gone with the wind",
-  "author": {
-    "id": 3,
-     "name": "Margaret Mitchell"
-  }
-}
-! Was at book shell with index 2
-{
-  "id": 4,
-  "name": "Anna Karenina",
-  "author": {
-    "id": 2,
-    "name": "Lev Tolstoy"
-  }
-}
-! Was at book shell with index 3
+{
+  "id": 3,
+   "name": "Gone with the wind",
+  "author": {
+    "id": 3,
+     "name": "Margaret Mitchell"
+  }
+}
+! Was at book shell with index 2
+{
+  "id": 4,
+  "name": "Anna Karenina",
+  "author": {
+    "id": 2,
+    "name": "Lev Tolstoy"
+  }
+}
+! Was at book shell with index 3
