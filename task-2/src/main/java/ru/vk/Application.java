@@ -1,15 +1,28 @@
 package ru.vk;
 
 
-import org.jetbrains.annotations.NotNull;
+import com.google.inject.Inject;
 
-public abstract class Application {
-    protected Long lineCounter = 1L;
-    protected final String tag;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
-    public Application(@NotNull String tag) {
-        this.tag = tag;
+public  class Application {
+    private final CustomLogger logger;
+
+    @Inject
+    public Application(CustomLogger logger) {
+        this.logger = logger;
     }
 
-    abstract void waitForInput();
+    void waitForInput() {
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("Waiting for new lines. Key in Ctrl+D to exit.");
+            while (true) {
+                String line = scanner.nextLine();
+                logger.info(line);
+            }
+        } catch (IllegalStateException | NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
