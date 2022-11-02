@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "name": "Crime And Punishment",
+    "author": {
+      "id": "1",
+      "name": "Fedor Dostoevsky"
+    }
+  },
+  {
+    "id": "2",
+    "name": "War and Peace",
+    "author": {
+      "id": "2",
+      "name": "Lev Tolstoy"
+    }
+  },
+  {
+    "id": "3",
+    "name": "Gone with the wind",
+    "author": {
+      "id": "3",
+      "name": "Margaret Mitchell"
+    }
+  },
+  {
+    "id": "4",
+    "name": "Anna Karenina",
+    "author": {
+      "id": "2",
+      "name": "Lev Tolstoy"
+    }
+  },
+  {
+    "id": "5",
+    "name": "Humiliated and Insulted",
+    "author": {
+      "id": "1",
+      "name": "Fedor Dostoevsky"
+    }
+  }
+]

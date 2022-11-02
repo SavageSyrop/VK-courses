@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="LibraryInjectTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2022-10-31T10:43:46" hostname="DESKTOP-RGGTMQN" time="1.891">
+  <properties/>
+  <testcase name="bookAddsAtFirstEmptyShelfIndex()" classname="LibraryInjectTest" time="1.805"/>
+  <testcase name="shelfSizeIsLesserThanCountOfBooksThenThrowException()" classname="LibraryInjectTest" time="0.03"/>
+  <testcase name="whenBookIsTakenFromEmptyShelfThenThrowException()" classname="LibraryInjectTest" time="0.043"/>
+  <system-out><![CDATA[{
+  "id": 3,
+  "name": "Gone with the wind",
+  "author": {
+    "id": 3,
+    "name": "Margaret Mitchell"
+  }
+}
+ Was at book shell with index 2
+{
+  "id": 4,
+  "name": "Anna Karenina",
+  "author": {
+    "id": 2,
+    "name": "Lev Tolstoy"
+  }
+}
+ Was at book shell with index 3
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

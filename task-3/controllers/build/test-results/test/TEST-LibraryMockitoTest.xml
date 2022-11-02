@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="LibraryMockitoTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2022-10-31T10:43:48" hostname="DESKTOP-RGGTMQN" time="0.158">
+  <properties/>
+  <testcase name="takenBookAndShelfIndexInfoPrintsInConsole()" classname="LibraryMockitoTest" time="0.101"/>
+  <testcase name="whenCapacityIsLesserThanReceivedBookCountThenThrowException()" classname="LibraryMockitoTest" time="0.008"/>
+  <testcase name="testAllBooksFromShelfsPrintedInConsole()" classname="LibraryMockitoTest" time="0.02"/>
+  <testcase name="checkBooksOrderEqualToFile()" classname="LibraryMockitoTest" time="0.009"/>
+  <testcase name="takenBookReturnsCorrectlyAndShelfBecomesEmpty()" classname="LibraryMockitoTest" time="0.011"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
