@@ -16,7 +16,7 @@ public class Main {
                 .locations("db")
                 .cleanDisabled(false)
                 .load();
-//        flyway.clean();
+        flyway.clean();
         flyway.migrate();
         System.out.println("Migrations applied successfully");
     }
