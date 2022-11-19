@@ -16,11 +16,11 @@ public final class ReceiptItemDAO extends AbstractDAO<ReceiptItem> {
     @Override
     public ReceiptItem get(Long pk) {
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM receipt_items WHERE id = " + pk);
             if (resultSet.next()) {
                 Long productCode = resultSet.getLong("product_code");
-                statement = connection.createStatement();
+                statement = getConnection().createStatement();
                 ResultSet productionResultSet = statement.executeQuery("SELECT * FROM products WHERE code = " + productCode);
                 if (productionResultSet.next()) {
                     Product product = new Product(productionResultSet.getLong("code"), productionResultSet.getString("name"));
@@ -38,11 +38,11 @@ public final class ReceiptItemDAO extends AbstractDAO<ReceiptItem> {
     public List<ReceiptItem> getAll() {
         List<ReceiptItem> result = new ArrayList<>();
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM receipt_items");
             while (resultSet.next()) {
                 Long productCode = resultSet.getLong("product_code");
-                statement = connection.createStatement();
+                statement = getConnection().createStatement();
                 ResultSet productionResultSet = statement.executeQuery("SELECT * FROM products WHERE code = " + productCode);
                 productionResultSet.next();
                 Product product = new Product(productionResultSet.getLong("code"), productionResultSet.getString("name"));
@@ -57,7 +57,7 @@ public final class ReceiptItemDAO extends AbstractDAO<ReceiptItem> {
 
     @Override
     public void delete(Long pk) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM receipt_items WHERE id = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("DELETE FROM receipt_items WHERE id = ?")) {
             preparedStatement.setLong(1, pk);
             if (preparedStatement.executeUpdate() == 0) {
                 throw new IllegalStateException("Receipt with id = " + pk + " not found");
@@ -69,7 +69,7 @@ public final class ReceiptItemDAO extends AbstractDAO<ReceiptItem> {
 
     @Override
     public void update(ReceiptItem object) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE receipt_items SET id = ?, receipt_id = ?, product_code = ?, price = ?, amount = ? WHERE id = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE receipt_items SET id = ?, receipt_id = ?, product_code = ?, price = ?, amount = ? WHERE id = ?")) {
             int fieldIndex = 1;
             preparedStatement.setLong(fieldIndex++, object.getId());
             preparedStatement.setLong(fieldIndex++, object.getReceiptId());
@@ -85,7 +85,7 @@ public final class ReceiptItemDAO extends AbstractDAO<ReceiptItem> {
 
     @Override
     public void create(ReceiptItem object) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO receipt_items (receipt_id, product_code, price, amount) VALUES(?,?,?,?)")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO receipt_items (receipt_id, product_code, price, amount) VALUES(?,?,?,?)")) {
             int fieldIndex = 1;
             preparedStatement.setLong(fieldIndex++, object.getReceiptId());
             preparedStatement.setLong(fieldIndex++, object.getProduct().getCode());

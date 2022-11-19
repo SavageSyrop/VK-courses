@@ -58,7 +58,7 @@ class ReceiptItemDAOTest extends AbstractTest {
     @Test
     void create() {
         try {
-            Connection connection = DriverManager.getConnection(JDBCCredentials.URL.getValue() + JDBCCredentials.TEST_DATABASE_NAME.getValue(), JDBCCredentials.LOGIN.getValue(), JDBCCredentials.PASSWORD.getValue());
+            Connection connection = receiptItemDAO.getConnection();
             Product product = productDAO.get(1L);
             Long receiptId = 10L;
             ReceiptItem receiptItem = new ReceiptItem(receiptId, product, 100, 200);

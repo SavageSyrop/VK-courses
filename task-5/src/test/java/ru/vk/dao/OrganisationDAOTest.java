@@ -3,17 +3,25 @@ package ru.vk.dao;
 import org.junit.jupiter.api.Test;
 import ru.vk.JDBCCredentials;
 import ru.vk.entities.Organisation;
+import ru.vk.entities.Receipt;
+import ru.vk.entities.ReceiptItem;
 
 import java.sql.*;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class OrganisationDAOTest extends AbstractTest {
     private final OrganisationDAO organisationDAO;
+    private final ReceiptDAO receiptDAO;
+    private final ReceiptItemDAO receiptItemDAO;
 
     public OrganisationDAOTest() throws SQLException {
-        this.organisationDAO = new OrganisationDAO(DriverManager.getConnection(JDBCCredentials.URL.getValue() + JDBCCredentials.TEST_DATABASE_NAME.getValue(), JDBCCredentials.LOGIN.getValue(), JDBCCredentials.PASSWORD.getValue()));
+        Connection connection = DriverManager.getConnection(JDBCCredentials.URL.getValue() + JDBCCredentials.TEST_DATABASE_NAME.getValue(), JDBCCredentials.LOGIN.getValue(), JDBCCredentials.PASSWORD.getValue());
+        this.organisationDAO = new OrganisationDAO(connection);
+        this.receiptDAO = new ReceiptDAO(connection);
+        this.receiptItemDAO = new ReceiptItemDAO(connection);
     }
 
 
@@ -64,9 +72,8 @@ class OrganisationDAOTest extends AbstractTest {
     @Test
     void createWhenDoesNotExist() {
         Organisation organisation = new Organisation(95129898L, "Боровский хлебокомбинат", 97853299L);
-        Connection connection = null;
+        Connection connection = organisationDAO.getConnection();
         try {
-            connection = DriverManager.getConnection(JDBCCredentials.URL.getValue() + JDBCCredentials.TEST_DATABASE_NAME.getValue(), JDBCCredentials.LOGIN.getValue(), JDBCCredentials.PASSWORD.getValue());
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM organisations WHERE tax_number = ?");
             statement.setLong(1, organisation.getTaxNumber());
             ResultSet resultSet = statement.executeQuery();
@@ -74,6 +81,7 @@ class OrganisationDAOTest extends AbstractTest {
             while (resultSet.next()) {
                 sizeBefore++;
             }
+            assertThrows(IllegalStateException.class, () -> organisationDAO.get(organisation.getTaxNumber()));
             organisationDAO.create(organisation);
             resultSet = statement.executeQuery();
             Long sizeAfter = 0L;
@@ -81,6 +89,7 @@ class OrganisationDAOTest extends AbstractTest {
                 sizeAfter++;
             }
             assertTrue(sizeBefore < sizeAfter);
+            assertNotNull(organisationDAO.get(organisation.getTaxNumber()));
         } catch (SQLException e) {
             fail();
         }
@@ -88,20 +97,46 @@ class OrganisationDAOTest extends AbstractTest {
 
     @Test
     void getTopTenOrganisationsByAmount() {
-        List<Organisation> objects = organisationDAO.getTopTenOrganisationsByAmount();
-        assertNotNull(objects);
-        List<Organisation> allOrganisations = organisationDAO.getAll();
-        assertFalse(objects.contains(allOrganisations.get(allOrganisations.size()-1)));
+        Map<Long, Integer> amountsByOrganisationTaxNumber = new HashMap<>();
+        for (ReceiptItem receiptItem : receiptItemDAO.getAll()) {
+            Receipt receipt = receiptDAO.get(receiptItem.getReceiptId());
+            Long organisationTaxNumber = receipt.getOrganisation().getTaxNumber();
+            Integer currentAmount = amountsByOrganisationTaxNumber.get(organisationTaxNumber);
+            if (currentAmount == null) {
+                currentAmount = 0;
+            }
+            currentAmount += receiptItem.getAmount();
+            amountsByOrganisationTaxNumber.put(organisationTaxNumber, currentAmount);
+        }
+        Set<Map.Entry<Long, Integer>> entries = amountsByOrganisationTaxNumber.entrySet();
+        List<Long> topOrganisations = entries.stream().sorted(Map.Entry.<Long, Integer>comparingByValue().reversed()).limit(10).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)).keySet().stream().toList();
+        List<Organisation> queryResult = organisationDAO.getTopTenOrganisationsByAmount();
+        for (Organisation organisation : queryResult) {
+            assertTrue(topOrganisations.contains(organisation.getTaxNumber()));
+        }
     }
 
     @Test
     void getOrganisationsWithByAmountMoreThanParameter() {
-        List<Organisation> objects = organisationDAO.getOrganisationsWithByAmountMoreThanParameter(10);
-        assertNotNull(objects);
-        assertEquals(10, objects.size());
-        objects = organisationDAO.getOrganisationsWithByAmountMoreThanParameter(10000000);
-        assertEquals(0, objects.size());
-        objects = organisationDAO.getOrganisationsWithByAmountMoreThanParameter(90);
-        assertEquals(3,objects.size());
+        Integer limit = 90;
+        Map<Long, Integer> amountsByOrganisationTaxNumber = new HashMap<>();
+        for (ReceiptItem receiptItem : receiptItemDAO.getAll()) {
+            Receipt receipt = receiptDAO.get(receiptItem.getReceiptId());
+            Long organisationTaxNumber = receipt.getOrganisation().getTaxNumber();
+            Integer currentAmount = amountsByOrganisationTaxNumber.get(organisationTaxNumber);
+            if (currentAmount == null) {
+                currentAmount = 0;
+            }
+            currentAmount += receiptItem.getAmount();
+            if (currentAmount > limit) {
+                amountsByOrganisationTaxNumber.put(organisationTaxNumber, currentAmount);
+            }
+        }
+        Set<Map.Entry<Long, Integer>> entries = amountsByOrganisationTaxNumber.entrySet();
+        List<Long> foundOrganisations = entries.stream().sorted(Map.Entry.<Long, Integer>comparingByValue().reversed()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new)).keySet().stream().toList();
+        List<Organisation> queryResult = organisationDAO.getOrganisationsWithByAmountMoreThanParameter(1, 90);
+        for (Organisation organisation : queryResult) {
+            assertTrue(foundOrganisations.contains(organisation.getTaxNumber()));
+        }
     }
 }

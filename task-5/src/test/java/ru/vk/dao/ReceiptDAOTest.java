@@ -73,7 +73,7 @@ class ReceiptDAOTest extends AbstractTest {
         Receipt receipt = new Receipt(localDate, organisation);
         receiptDAO.create(receipt);
         try {
-            Connection connection = DriverManager.getConnection(JDBCCredentials.URL.getValue() + JDBCCredentials.TEST_DATABASE_NAME.getValue(), JDBCCredentials.LOGIN.getValue(), JDBCCredentials.PASSWORD.getValue());
+            Connection connection = receiptDAO.getConnection();
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM receipts order by id desc");
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {

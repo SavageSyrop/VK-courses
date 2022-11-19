@@ -20,7 +20,7 @@ public class Main {
             LocalDate from = LocalDate.of(2022, 11, 11);
             LocalDate to = LocalDate.of(2022, 11, 21);
             System.out.println(gson.toJson(organisationDAO.getTopTenOrganisationsByAmount()));
-            System.out.println(gson.toJson(organisationDAO.getOrganisationsWithByAmountMoreThanParameter(90)));
+            System.out.println(gson.toJson(organisationDAO.getOrganisationsWithByAmountMoreThanParameter(1, 90)));
             System.out.println(gson.toJson(productDAO.getEveryDayProductStatsBetweenDates(from, to)));
             System.out.println(gson.toJson(productDAO.getAveragePriceOfEveryProductBetweenDates(from, to)));
             System.out.println(gson.toJson(productDAO.getAllProductsBetweenDates(from, to)));

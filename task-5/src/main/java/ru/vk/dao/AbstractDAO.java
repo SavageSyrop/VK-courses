@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class AbstractDAO<T> {
 
-    protected final @NotNull Connection connection;
+    private final @NotNull Connection connection;
 
     public AbstractDAO(@NotNull Connection connection) {
         this.connection = connection;
@@ -22,4 +22,9 @@ public abstract class AbstractDAO<T> {
     public abstract void update(T object);
 
     public abstract void create(T object);
+
+    @NotNull
+    public Connection getConnection() {
+        return connection;
+    }
 }

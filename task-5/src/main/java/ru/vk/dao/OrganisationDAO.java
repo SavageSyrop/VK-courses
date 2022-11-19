@@ -14,7 +14,7 @@ public final class OrganisationDAO extends AbstractDAO<Organisation> {
 
     @Override
     public Organisation get(Long pk) {
-        try (Statement statement = connection.createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM organisations WHERE tax_number = " + pk);
             if (resultSet.next()) {
                 return new Organisation(resultSet.getLong("tax_number"), resultSet.getString("name"), resultSet.getLong("checking_account"));
@@ -28,7 +28,7 @@ public final class OrganisationDAO extends AbstractDAO<Organisation> {
     @Override
     public List<Organisation> getAll() {
         List<Organisation> result = new ArrayList<>();
-        try (Statement statement = connection.createStatement()) {
+        try (Statement statement = getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery("SELECT * FROM organisations");
             while (resultSet.next()) {
                 result.add(new Organisation(resultSet.getLong("tax_number"), resultSet.getString("name"), resultSet.getLong("checking_account")));
@@ -42,7 +42,7 @@ public final class OrganisationDAO extends AbstractDAO<Organisation> {
 
     @Override
     public void delete(Long pk) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM organisations WHERE tax_number = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("DELETE FROM organisations WHERE tax_number = ?")) {
             preparedStatement.setLong(1, pk);
             if (preparedStatement.executeUpdate() == 0) {
                 throw new IllegalStateException("Organisation with id = " + pk + " not found");
@@ -54,7 +54,7 @@ public final class OrganisationDAO extends AbstractDAO<Organisation> {
 
     @Override
     public void update(Organisation object) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE organisations SET tax_number = ?, name = ?, checking_account = ? WHERE tax_number = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE organisations SET tax_number = ?, name = ?, checking_account = ? WHERE tax_number = ?")) {
             int fieldIndex = 1;
             preparedStatement.setLong(fieldIndex++, object.getTaxNumber());
             preparedStatement.setString(fieldIndex++, object.getName());
@@ -67,7 +67,7 @@ public final class OrganisationDAO extends AbstractDAO<Organisation> {
 
     @Override
     public void create(Organisation object) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO organisations(tax_number, name, checking_account) VALUES(?,?,?)")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO organisations(tax_number, name, checking_account) VALUES(?,?,?)")) {
             int fieldIndex = 1;
             preparedStatement.setLong(fieldIndex++, object.getTaxNumber());
             preparedStatement.setString(fieldIndex++, object.getName());
@@ -80,8 +80,8 @@ public final class OrganisationDAO extends AbstractDAO<Organisation> {
 
     public List<Organisation> getTopTenOrganisationsByAmount() {
         List<Organisation> topOrganisations = new ArrayList<>();
-        try (Statement statement = connection.createStatement()) {
-            String query = "SELECT o.* FROM organisations AS o LEFT JOIN receipts AS r ON r.organisation_tax_number = o.tax_number LEFT JOIN receipt_items AS i ON r.id = i.receipt_id GROUP BY o.tax_number ORDER BY sum(i.amount) DESC LIMIT 10";
+        try (Statement statement = getConnection().createStatement()) {
+            String query = "SELECT o.* FROM organisations AS o INNER JOIN receipts AS r ON r.organisation_tax_number = o.tax_number INNER JOIN receipt_items AS i ON r.id = i.receipt_id GROUP BY o.tax_number ORDER BY sum(i.amount) DESC LIMIT 10";
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 topOrganisations.add(new Organisation(resultSet.getLong("tax_number"), resultSet.getString("name"), resultSet.getLong("checking_account")));
@@ -93,10 +93,11 @@ public final class OrganisationDAO extends AbstractDAO<Organisation> {
     }
 
 
-    public List<Organisation> getOrganisationsWithByAmountMoreThanParameter(Integer limit) {
+    public List<Organisation> getOrganisationsWithByAmountMoreThanParameter(Integer productCode, Integer limit) {
         List<Organisation> organisations = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement("SELECT o.* FROM organisations AS o LEFT JOIN receipts AS r ON r.organisation_tax_number = o.tax_number INNER JOIN receipt_items AS i ON r.id = i.receipt_id GROUP BY o.tax_number HAVING sum(i.amount) > ?")) {
+        try (PreparedStatement statement = getConnection().prepareStatement("SELECT o.* FROM organisations AS o INNER JOIN receipts AS r ON r.organisation_tax_number = o.tax_number INNER JOIN receipt_items AS i ON r.id = i.receipt_id GROUP BY o.tax_number, i.product_code HAVING sum(i.amount) > ? and i.product_code = ?")) {
             statement.setLong(1, limit);
+            statement.setLong(2, productCode);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 organisations.add(new Organisation(resultSet.getLong("tax_number"), resultSet.getString("name"), resultSet.getLong("checking_account")));

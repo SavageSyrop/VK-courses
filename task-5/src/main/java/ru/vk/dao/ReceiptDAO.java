@@ -18,20 +18,20 @@ public final class ReceiptDAO extends AbstractDAO<Receipt> {
     @Override
     public Receipt get(Long pk) {
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM receipts WHERE id = " + pk);
             if (resultSet.next()) {
                 Long organisationPrimaryKey = resultSet.getLong("organisation_tax_number");
-                statement = connection.createStatement();
+                statement = getConnection().createStatement();
                 ResultSet organisationResultSet = statement.executeQuery("SELECT * FROM organisations WHERE tax_number = " + organisationPrimaryKey);
                 organisationResultSet.next();
                 Organisation organisation = new Organisation(organisationResultSet.getLong("tax_number"), organisationResultSet.getString("name"), organisationResultSet.getLong("checking_account"));
-                statement = connection.createStatement();
+                statement = getConnection().createStatement();
                 ResultSet itemsResultSet = statement.executeQuery("SELECT * FROM receipt_items WHERE receipt_id = " + resultSet.getLong("id"));
                 List<ReceiptItem> items = new ArrayList<>();
                 while (itemsResultSet.next()) {
                     Long productCode = itemsResultSet.getLong("product_code");
-                    statement = connection.createStatement();
+                    statement = getConnection().createStatement();
                     ResultSet productionResultSet = statement.executeQuery("SELECT * FROM products WHERE code = " + productCode);
                     productionResultSet.next();
                     Product product = new Product(productionResultSet.getLong("code"), productionResultSet.getString("name"));
@@ -49,20 +49,20 @@ public final class ReceiptDAO extends AbstractDAO<Receipt> {
     public List<Receipt> getAll() {
         List<Receipt> result = new ArrayList<>();
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = getConnection().createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM receipts");
             while (resultSet.next()) {
                 Long organisationPrimaryKey = resultSet.getLong("organisation_tax_number");
-                statement = connection.createStatement();
+                statement = getConnection().createStatement();
                 ResultSet organisationResultSet = statement.executeQuery("SELECT * FROM organisations WHERE tax_number = " + organisationPrimaryKey);
                 organisationResultSet.next();
                 Organisation organisation = new Organisation(organisationResultSet.getLong("tax_number"), organisationResultSet.getString("name"), organisationResultSet.getLong("checking_account"));
-                statement = connection.createStatement();
+                statement = getConnection().createStatement();
                 ResultSet itemsResultSet = statement.executeQuery("SELECT * FROM receipt_items WHERE receipt_id = " + resultSet.getLong("id"));
                 List<ReceiptItem> items = new ArrayList<>();
                 while (itemsResultSet.next()) {
                     Long productCode = itemsResultSet.getLong("product_code");
-                    statement = connection.createStatement();
+                    statement = getConnection().createStatement();
                     ResultSet productionResultSet = statement.executeQuery("SELECT * FROM products WHERE code = " + productCode);
                     productionResultSet.next();
                     Product product = new Product(productionResultSet.getLong("code"), productionResultSet.getString("name"));
@@ -79,7 +79,7 @@ public final class ReceiptDAO extends AbstractDAO<Receipt> {
 
     @Override
     public void delete(Long pk) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM receipts WHERE id = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("DELETE FROM receipts WHERE id = ?")) {
             preparedStatement.setLong(1, pk);
             if (preparedStatement.executeUpdate() == 0) {
                 throw new IllegalStateException("Receipt with id = " + pk + " not found");
@@ -91,7 +91,7 @@ public final class ReceiptDAO extends AbstractDAO<Receipt> {
 
     @Override
     public void update(Receipt object) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE receipts SET id = ?, creation_date = ?, organisation_tax_number = ? WHERE id = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE receipts SET id = ?, creation_date = ?, organisation_tax_number = ? WHERE id = ?")) {
             int fieldIndex = 1;
             preparedStatement.setLong(fieldIndex++, object.getId());
             preparedStatement.setDate(fieldIndex++, Date.valueOf(object.getCreationDate()));
@@ -104,7 +104,7 @@ public final class ReceiptDAO extends AbstractDAO<Receipt> {
 
     @Override
     public void create(Receipt object) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO receipts(creation_date, organisation_tax_number) VALUES(?,?)")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO receipts(creation_date, organisation_tax_number) VALUES(?,?)")) {
             int fieldIndex = 1;
             preparedStatement.setDate(fieldIndex++, Date.valueOf(object.getCreationDate()));
             preparedStatement.setLong(fieldIndex, object.getOrganisation().getTaxNumber());

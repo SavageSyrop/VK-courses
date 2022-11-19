@@ -19,7 +19,7 @@ create table receipts (
 create table receipt_items (
     id serial primary key not null,
     receipt_id serial references receipts(id) not null,
-    product_code serial references products(code),
+    product_code serial references products(code) not null,
     price int not null,
     amount int not null
 );
