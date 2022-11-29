@@ -68,7 +68,6 @@ public abstract class AbstractDAO<T extends UpdatableRecordImpl<T>, D extends Nu
     }
 
 
-
     @NotNull
     public TableImpl<T> getTableName() {
         return tableName;

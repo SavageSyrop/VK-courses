@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 
 public class MainServlet extends HttpServlet {
     private final ProductDAO productDAO;
@@ -24,14 +23,14 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try (ServletOutputStream outputStream = resp.getOutputStream()){
-            StringBuilder stringBuilder= new StringBuilder();
+        try (ServletOutputStream outputStream = resp.getOutputStream()) {
+            StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("<!DOCTYPE html>");
             stringBuilder.append("<html lang=\"en\">");
             stringBuilder.append("<body>");
             stringBuilder.append("<h1>All products from DB</h1>");
 
-            for (ProductRecord productRecord: productDAO.getAll()) {
+            for (ProductRecord productRecord : productDAO.getAll()) {
                 stringBuilder.append(productRecord.toString().replace("\n", "<br>\n"));
             }
 
@@ -47,25 +46,13 @@ public class MainServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String productName = req.getParameter("name");
         String companyName = req.getParameter("company_name");
-
-        if (productName == null || companyName == null) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Empty productName and companyName parameters");
-        }
-
-        String strAmount = req.getParameter("amount");
-        Integer amount = 0;
+        Integer amount = Integer.parseInt(req.getParameter("amount"));
         try {
-            amount = Integer.parseInt(strAmount);
             companyDAO.getByName(companyName);
         } catch (IllegalStateException e) {
             CompanyRecord companyRecord = new CompanyRecord();
             companyRecord.setName(companyName);
             companyDAO.create(companyRecord);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
         }
         ProductRecord productRecord = new ProductRecord();
         productRecord.setName(productName);

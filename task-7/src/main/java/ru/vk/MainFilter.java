@@ -27,27 +27,35 @@ public class MainFilter implements Filter {
 
             case "POST": {
                 try {
-                    String productName = servletRequest.getParameter("productName");
-                    String companyName = servletRequest.getParameter("companyName");
-                    Integer amount = Integer.parseInt(servletRequest.getParameter("amount"));
+                    String productName = servletRequest.getParameter("name");
+                    String companyName = servletRequest.getParameter("company_name");
+                    HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+                    Integer amount = 0;
+
+                    if (productName == null || companyName == null) {
+                        httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Empty productName pr companyName parameters");
+                        return;
+                    }
+
+                    try {
+                        amount = Integer.parseInt(servletRequest.getParameter("amount"));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "Non numeric amount");
+                        return;
+                    }
+
                     chain.doFilter(request, response);
                     return;
                 } catch (RuntimeException e) {
                     e.printStackTrace();
                 }
             }
-
-            case "OPTIONS": {
-                chain.doFilter(request, response);
-                return;
-            }
-
             default: {
                 HttpServletResponse httpResponse = (HttpServletResponse) response;
                 httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
-
     }
 
     @Override

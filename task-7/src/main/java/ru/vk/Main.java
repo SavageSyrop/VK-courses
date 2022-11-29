@@ -15,8 +15,6 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -58,7 +56,7 @@ public class Main {
         ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
 
-        context.setWelcomeFiles(new String[] {"/static/mainpage.html"});
+        context.setWelcomeFiles(new String[]{"/static/mainpage.html"});
         context.addServlet(new ServletHolder("default", DefaultServlet.class), "/");
         context.addServlet(new ServletHolder("products", new MainServlet(new ProductDAO(connection), new CompanyDAO(connection))), "/products");
 
@@ -85,7 +83,6 @@ public class Main {
         context.setSecurityHandler(securityHandler);
         server.addBean(loginService);
         server.setHandler(context);
-        System.out.println(new CompanyDAO(connection).getAll());
         try {
             server.start();
         } catch (Exception e) {

@@ -2,7 +2,7 @@ package ru.vk;
 
 import org.flywaydb.core.Flyway;
 
-public final class  FlywayInitializer {
+public final class FlywayInitializer {
     public static void initDatabase() {
         final Flyway flyway = Flyway.configure()
                 .dataSource(

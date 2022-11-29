@@ -1,11 +1,11 @@
 package ru.vk;
 
-import generatedEntities.tables.Company;
 import generatedEntities.tables.records.CompanyRecord;
 import org.jetbrains.annotations.NotNull;
-import static generatedEntities.tables.Company.COMPANY;
 
 import java.sql.Connection;
+
+import static generatedEntities.tables.Company.COMPANY;
 
 public class CompanyDAO extends AbstractDAO<CompanyRecord, Integer> {
     public CompanyDAO(@NotNull Connection connection) {

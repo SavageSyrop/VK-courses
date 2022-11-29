@@ -18,7 +18,7 @@ public class SecurityHandlerBuilder {
 
     private final ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
 
-    public final ConstraintSecurityHandler build (LoginService loginService) {
+    public final ConstraintSecurityHandler build(LoginService loginService) {
         securityHandler.setLoginService(loginService);
 
         List<ConstraintMapping> constraintMappings = new ArrayList<>();
