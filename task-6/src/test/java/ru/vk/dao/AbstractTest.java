@@ -15,7 +15,7 @@ public abstract class AbstractTest {
 
     @BeforeEach
     protected void initDB() {
-        FlywayInitializer.initTestDatabase();
+        FlywayInitializer.initDatabase(DatabaseCredentials.TEST_DATABASE_NAME.getValue());
     }
 
     public AbstractTest() {

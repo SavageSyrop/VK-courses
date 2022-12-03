@@ -21,10 +21,23 @@ public final class OrganisationDAO extends AbstractDAO<OrganisationRecord, Long>
     }
 
     public List<OrganisationRecord> getTopTenOrganisationsByAmount() {
-        return getContext().select(getTableName().fields()).from(getTableName()).innerJoin(RECEIPT).on(RECEIPT.ORGANISATION_TAX_NUMBER.eq(ORGANISATION.TAX_NUMBER)).innerJoin(RECEIPT_ITEM).on(RECEIPT.ID.eq(RECEIPT_ITEM.RECEIPT_ID)).groupBy(ORGANISATION.TAX_NUMBER).orderBy(sum(RECEIPT_ITEM.AMOUNT).desc()).limit(10).fetchInto(getTableName());
+        return getContext().select(getTableName().fields())
+                .from(getTableName())
+                .innerJoin(RECEIPT).on(RECEIPT.ORGANISATION_TAX_NUMBER.eq(ORGANISATION.TAX_NUMBER))
+                .innerJoin(RECEIPT_ITEM).on(RECEIPT.ID.eq(RECEIPT_ITEM.RECEIPT_ID))
+                .groupBy(ORGANISATION.TAX_NUMBER)
+                .orderBy(sum(RECEIPT_ITEM.AMOUNT).desc())
+                .limit(10)
+                .fetchInto(getTableName());
     }
 
-    public List<OrganisationRecord> getOrganisationsWithByAmountMoreThanParameter(Integer productCode, Integer limit) {
-        return getContext().select(getTableName().fields()).from(getTableName()).innerJoin(RECEIPT).on(RECEIPT.ORGANISATION_TAX_NUMBER.eq(ORGANISATION.TAX_NUMBER)).innerJoin(RECEIPT_ITEM).on(RECEIPT.ID.eq(RECEIPT_ITEM.RECEIPT_ID)).groupBy(ORGANISATION.TAX_NUMBER, RECEIPT_ITEM.PRODUCT_CODE).having(sum(RECEIPT_ITEM.AMOUNT).gt(BigDecimal.valueOf(limit)).and(RECEIPT_ITEM.PRODUCT_CODE.eq(productCode))).fetchInto(getTableName());
+    public List<OrganisationRecord> getOrganisationsWithByAmountMoreThanParameter(@NotNull Integer productCode, @NotNull Integer limit) {
+        return getContext().select(getTableName().fields())
+                .from(getTableName())
+                .innerJoin(RECEIPT).on(RECEIPT.ORGANISATION_TAX_NUMBER.eq(ORGANISATION.TAX_NUMBER))
+                .innerJoin(RECEIPT_ITEM).on(RECEIPT.ID.eq(RECEIPT_ITEM.RECEIPT_ID))
+                .groupBy(ORGANISATION.TAX_NUMBER, RECEIPT_ITEM.PRODUCT_CODE)
+                .having(sum(RECEIPT_ITEM.AMOUNT).gt(BigDecimal.valueOf(limit)).and(RECEIPT_ITEM.PRODUCT_CODE.eq(productCode)))
+                .fetchInto(getTableName());
     }
 }

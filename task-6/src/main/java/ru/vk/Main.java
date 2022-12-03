@@ -13,7 +13,7 @@ import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) {
-        FlywayInitializer.initDatabase();
+        FlywayInitializer.initDatabase(DatabaseCredentials.DATABASE_NAME.getValue());
         Properties properties = new Properties();
         properties.setProperty("dataSourceClassName", "org.postgresql.ds.PGSimpleDataSource");
         properties.setProperty("dataSource.user", DatabaseCredentials.LOGIN.getValue());

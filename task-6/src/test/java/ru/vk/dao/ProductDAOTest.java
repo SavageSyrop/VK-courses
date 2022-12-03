@@ -55,7 +55,7 @@ class ProductDAOTest extends AbstractTest {
 
     @Test
     void deleteWhenIsReferencedByOtherEntities() {
-        Integer code = 1;
+        int code = 1;
         assertThrows(DataAccessException.class, () -> productDAO.delete(code));
         assertNotNull(productDAO.get(code));
     }
@@ -68,7 +68,7 @@ class ProductDAOTest extends AbstractTest {
 
     @Test
     void update() {
-        Integer code = 2;
+        int code = 2;
         ProductRecord product = productDAO.get(code);
         String oldName = "Хлеб черный";
         assertEquals(product.getName(), oldName);
@@ -81,13 +81,13 @@ class ProductDAOTest extends AbstractTest {
     @Test
     void create() {
         List<ProductRecord> productRecords = productDAO.getAll();
-        Integer sizeBefore = productRecords.size();
+        int sizeBefore = productRecords.size();
         assertThrows(IllegalStateException.class, () -> productDAO.get(sizeBefore + 1));
         ProductRecord product = new ProductRecord();
         product.setName("Хлеб особенный");
         productDAO.create(product);
         productRecords = productDAO.getAll();
-        Integer sizeAfter = productRecords.size();
+        int sizeAfter = productRecords.size();
         assertTrue(sizeBefore < sizeAfter);
         assertNotNull(productDAO.get(sizeAfter));
     }
@@ -98,8 +98,8 @@ class ProductDAOTest extends AbstractTest {
         LocalDate from = LocalDate.of(2022, 11, 11);
         LocalDate to = LocalDate.of(2022, 11, 21);
 
-        Integer queryTotalPrice = 0;
-        Integer codeTotalPrice = 0;
+        int queryTotalPrice = 0;
+        int codeTotalPrice = 0;
 
         List<Record5<LocalDate, Integer, Integer, Integer, Integer>> queryResult = productDAO.getEveryDayProductStatsBetweenDates(from, to);
 
@@ -108,11 +108,13 @@ class ProductDAOTest extends AbstractTest {
 
             Object totalPrice = record.get("total_price");
             if (totalPrice == null) {
-                throw new IllegalStateException("Empty total_price field");
+                fail();
             } else {
                 queryTotalPrice += Integer.parseInt(totalPrice.toString());
             }
-            assertTrue(from.equals(creationDate) || creationDate.equals(to) || (from.isBefore(creationDate) && to.isAfter(creationDate)));
+            boolean isOnBorderDates = from.equals(creationDate) || creationDate.equals(to);
+            boolean isBetweenDates = (from.isBefore(creationDate) && to.isAfter(creationDate));
+            assertTrue(isOnBorderDates || isBetweenDates);
         }
 
         for (ReceiptItemRecord item : receiptItemDAO.getAll()) {
@@ -165,12 +167,15 @@ class ProductDAOTest extends AbstractTest {
         for (OrganisationRecord organisation : organisationDAO.getAll()) {
             organisationHasProducts.put(organisation.getTaxNumber(), false);
         }
+
         Map<Long, List<Integer>> productsByOrganisation = new HashMap<>();
         for (ReceiptItemRecord receiptItem : receiptItemDAO.getAll()) {
             ReceiptRecord receipt = receiptDAO.get(receiptItem.getReceiptId());
             LocalDate creationDate = receipt.getCreationDate();
             Long organisationTaxNumber = receipt.getOrganisationTaxNumber();
-            if (from.equals(creationDate) || creationDate.equals(to) || (from.isBefore(creationDate) && to.isAfter(creationDate))) {
+            boolean isOnBorderDates = from.equals(creationDate) || creationDate.equals(to);
+            boolean isBetweenDates = (from.isBefore(creationDate) && to.isAfter(creationDate));
+            if (isOnBorderDates || isBetweenDates) {
                 if (!productsByOrganisation.containsKey(organisationTaxNumber)) {
                     productsByOrganisation.put(organisationTaxNumber, new ArrayList<>());
                     organisationHasProducts.put(organisationTaxNumber, true);

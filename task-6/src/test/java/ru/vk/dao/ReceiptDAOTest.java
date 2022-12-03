@@ -20,13 +20,13 @@ class ReceiptDAOTest extends AbstractTest {
 
     @Test
     void getWhenPrimaryKeyExists() {
-        Integer pk = 1;
+        int pk = 1;
         assertNotNull(receiptDAO.get(pk));
     }
 
     @Test
     void getWhenPrimaryKeyDoesNotExist() {
-        Integer pk = 54;
+        int pk = 54;
         assertThrows(IllegalStateException.class, () -> receiptDAO.get(pk));
     }
 
@@ -37,14 +37,14 @@ class ReceiptDAOTest extends AbstractTest {
 
     @Test
     void deleteWhenIsReferencedByOtherEntities() {
-        Integer id = 1;
+        int id = 1;
         assertThrows(DataAccessException.class, () -> receiptDAO.delete(id));
         assertNotNull(receiptDAO.get(id));
     }
 
     @Test
     void deleteWhenIsNotReferencedByOtherEntities() {
-        Integer id = 11;
+        int id = 11;
         assertNotNull(receiptDAO.get(id));
         receiptDAO.delete(id);
         assertThrows(IllegalStateException.class, () -> receiptDAO.get(id));
@@ -52,7 +52,7 @@ class ReceiptDAOTest extends AbstractTest {
 
     @Test
     void update() {
-        Integer id = 1;
+        int id = 1;
         ReceiptRecord receipt = receiptDAO.get(id);
         LocalDate localDate = receipt.getCreationDate();
         assertEquals(receiptDAO.get(id).getCreationDate(), localDate);
@@ -69,9 +69,9 @@ class ReceiptDAOTest extends AbstractTest {
         ReceiptRecord receipt = new ReceiptRecord();
         receipt.setCreationDate(creationTime);
         receipt.setOrganisationTaxNumber(organisationTaxNumber);
-        Integer sizeBefore = receiptDAO.getAll().size();
+        int sizeBefore = receiptDAO.getAll().size();
         receiptDAO.create(receipt);
-        Integer sizeAfter = receiptDAO.getAll().size();
+        int sizeAfter = receiptDAO.getAll().size();
         assertTrue(sizeBefore < sizeAfter);
         ReceiptRecord createdReceipt = receiptDAO.get(sizeAfter);
         assertNotNull(createdReceipt);

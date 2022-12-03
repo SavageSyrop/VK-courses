@@ -16,13 +16,13 @@ class ReceiptItemDAOTest extends AbstractTest {
 
     @Test
     void getWhenPrimaryKeyNotFound() {
-        Integer pk = 54;
+        int pk = 54;
         assertThrows(IllegalStateException.class, () -> receiptItemDAO.get(pk));
     }
 
     @Test
     void getWhenPrimaryKeyFound() {
-        Integer pk = 1;
+        int pk = 1;
         assertNotNull(receiptItemDAO.get(pk));
     }
 
@@ -33,7 +33,7 @@ class ReceiptItemDAOTest extends AbstractTest {
 
     @Test
     void delete() {
-        Integer pk = 1;
+        int pk = 1;
         assertNotNull(receiptItemDAO.get(pk));
         receiptItemDAO.delete(pk);
         assertThrows(IllegalStateException.class, () -> receiptItemDAO.get(pk));
@@ -41,9 +41,9 @@ class ReceiptItemDAOTest extends AbstractTest {
 
     @Test
     void update() {
-        Integer pk = 1;
+        int pk = 1;
         ReceiptItemRecord receiptItem = receiptItemDAO.get(pk);
-        Integer oldAmount = receiptItem.getAmount();
+        int oldAmount = receiptItem.getAmount();
         receiptItem.setAmount(10);
         receiptItemDAO.update(receiptItem);
         assertNotEquals(oldAmount, receiptItemDAO.get(pk).getAmount());
@@ -51,17 +51,17 @@ class ReceiptItemDAOTest extends AbstractTest {
 
     @Test
     void create() {
-        Integer productCode = 1;
-        Integer receiptId = 10;
+        int productCode = 1;
+        int receiptId = 10;
         ReceiptItemRecord receiptItem = new ReceiptItemRecord();
         receiptItem.setReceiptId(receiptId);
         receiptItem.setAmount(200);
         receiptItem.setPrice(100);
         receiptItem.setProductCode(productCode);
-        Integer sizeBefore = receiptItemDAO.getAll().size();
+        int sizeBefore = receiptItemDAO.getAll().size();
         assertThrows(IllegalStateException.class, () -> receiptItemDAO.get(sizeBefore + 1));
         receiptItemDAO.create(receiptItem);
-        Integer sizeAfter = receiptItemDAO.getAll().size();
+        int sizeAfter = receiptItemDAO.getAll().size();
         assertTrue(sizeBefore < sizeAfter);
         ReceiptItemRecord receiptItemRecord = receiptItemDAO.get(sizeAfter);
         assertEquals(receiptItemRecord.get(RECEIPT_ITEM.RECEIPT_ID), receiptItem.getReceiptId());

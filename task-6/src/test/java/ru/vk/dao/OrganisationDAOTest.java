@@ -25,14 +25,14 @@ class OrganisationDAOTest extends AbstractTest {
 
     @Test
     void getWhenPrimaryKeyFound() {
-        Long taxNumber = 21632632L;
+        long taxNumber = 21632632;
         assertNotNull(organisationDAO.get(taxNumber));
     }
 
 
     @Test
     void getWhenPrimaryKeyNotFound() {
-        Long taxNumber = 228322L;
+        long taxNumber = 228322;
         assertThrows(IllegalStateException.class, () -> organisationDAO.get(taxNumber));
     }
 
@@ -44,14 +44,14 @@ class OrganisationDAOTest extends AbstractTest {
 
     @Test
     void deleteWhenIsReferencedByOtherEntities() {
-        Long taxNumber = 21632632L;
+        long taxNumber = 21632632;
         assertThrows(DataAccessException.class, () -> organisationDAO.delete(taxNumber));
         assertNotNull(organisationDAO.get(taxNumber));
     }
 
     @Test
     void deleteWhenIsNotReferencedByOtherEntities() {
-        Long taxNumber = 64392994L;
+        long taxNumber = 64392994;
         assertNotNull(organisationDAO.get(taxNumber));
         organisationDAO.delete(taxNumber);
         assertThrows(IllegalStateException.class, () -> organisationDAO.get(taxNumber));
@@ -59,7 +59,7 @@ class OrganisationDAOTest extends AbstractTest {
 
     @Test
     void update() {
-        Long taxNumber = 64392994L;
+        long taxNumber = 64392994;
         OrganisationRecord organisation = organisationDAO.get(taxNumber);
         String oldName = organisation.getName();
         organisation.setName("Хабаровский хлебокомбинат");
@@ -98,7 +98,7 @@ class OrganisationDAOTest extends AbstractTest {
 
     @Test
     void getOrganisationsWithByAmountMoreThanParameter() {
-        Integer limit = 90;
+        int limit = 90;
         Map<Long, Integer> amountsByOrganisationTaxNumber = new HashMap<>();
         for (ReceiptItemRecord receiptItem : receiptItemDAO.getAll()) {
             ReceiptRecord receipt = receiptDAO.get(receiptItem.getReceiptId());

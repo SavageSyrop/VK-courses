@@ -25,7 +25,7 @@ public class ProductDAO extends AbstractDAO<ProductRecord, Integer> {
     }
 
 
-    public List<Record5<LocalDate, Integer, Integer, Integer, Integer>> getEveryDayProductStatsBetweenDates(LocalDate from, LocalDate to) {
+    public List<Record5<LocalDate, Integer, Integer, Integer, Integer>> getEveryDayProductStatsBetweenDates(@NotNull LocalDate from, @NotNull LocalDate to) {
         if (to.isBefore(from)) {
             throw new IllegalArgumentException("Wrong dates: period end is before period start");
         }
@@ -44,7 +44,7 @@ public class ProductDAO extends AbstractDAO<ProductRecord, Integer> {
                 .fetch();
     }
 
-    public List<Record2<Integer, BigDecimal>> getAveragePriceOfEveryProductBetweenDates(LocalDate from, LocalDate to) {
+    public List<Record2<Integer, BigDecimal>> getAveragePriceOfEveryProductBetweenDates(@NotNull LocalDate from, @NotNull LocalDate to) {
         if (to.isBefore(from)) {
             throw new IllegalArgumentException("Wrong dates: period end is before period start");
         }
@@ -59,7 +59,7 @@ public class ProductDAO extends AbstractDAO<ProductRecord, Integer> {
                 .fetch();
     }
 
-    public List<Record4<Integer, String, String, Long>> getAllProductsBetweenDates(LocalDate from, LocalDate to) {
+    public List<Record4<Integer, String, String, Long>> getAllProductsBetweenDates(@NotNull LocalDate from, @NotNull LocalDate to) {
         if (to.isBefore(from)) {
             throw new IllegalArgumentException("Wrong dates: period end is before period start");
         }
