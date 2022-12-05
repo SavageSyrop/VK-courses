@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hi zyabls!</title>
+</head>
+<body>
+    <h1 style="color: fuchsia">This server has one REST controller with GET and POST requests</h1>
+    <p>GET: localhost:3466/products<br>Use to watch information about products. Is open for guests and managers.</p>
+    <p>POST: localhost:3466/products<br>Adds product to bd, if organisation is not found creates it. Open for managers only. Use request body to send JSON</p>
+    <p>POST: localhost:3466/products/delete?productName=product<br>Deletes all products with name equal to query param from request. Open for managers only.</p>
+    <p>GET: localhost:3466/products/{companyName}<br>Use to watch information about all products from chosen company. Is open for guests and managers.</p>
+</body>
+</html>
