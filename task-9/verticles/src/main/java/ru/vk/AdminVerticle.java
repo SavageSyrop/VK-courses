@@ -120,21 +120,6 @@ public class AdminVerticle extends AbstractVerticle {
         });
     }
 
-//    private void handleIfBecomeOffline() {
-//        vertx.eventBus().consumer(TURN_OFF_ADMIN + getParticipantInfo().getId(), event -> {
-//            vertx.sharedData().<Long, ClanInfo>getAsyncMap(CLAN_MAP, map ->
-//                    map.result().get(getParticipantInfo().getClanId(), clanInfo -> {
-//                        ClanInfo info = clanInfo.result();
-//                        info.setIsActive(false);
-//                        System.out.println("Administrator " + getParticipantInfo().getName() + " is offline now, so clan is inactive");
-//                        map.result().put(info.getId(), info, result -> {
-//                            vertx.eventBus().publish(NEED_TO_RECONNECT + getParticipantInfo().getClanId(), null);
-//                        });
-//                    }));
-//            vertx.eventBus().publish(NEED_TO_RECONNECT + getParticipantInfo().getClanId(), null);
-//        });
-//    }
-
     public static final class Factory extends JavaVerticleFactory {
         private final Integer clanId;
         private final Integer capacityUser;
