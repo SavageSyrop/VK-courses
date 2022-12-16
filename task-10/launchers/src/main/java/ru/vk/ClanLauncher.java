@@ -6,7 +6,7 @@ import io.vertx.core.VertxOptions;
 
 public class ClanLauncher {
     public static void main(String[] args) {
-        launchClanVerticle(1);
+        launchClanVerticle(2);
     }
 
     private static void launchClanVerticle(int amount) {

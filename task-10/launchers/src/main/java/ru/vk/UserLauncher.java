@@ -6,12 +6,16 @@ import io.vertx.core.VertxOptions;
 
 public class UserLauncher {
     public static void main(String[] args) {
+        launchUserVericle(3000);
+        launchUserVericle(4000);
         launchUserVericle(5000);
         launchUserVericle(6000);
         launchUserVericle(7000);
         launchUserVericle(8000);
         launchUserVericle(9000);
         launchUserVericle(10000);
+        launchUserVericle(11000);
+
     }
 
     public static void launchUserVericle(int messageTimeout) {

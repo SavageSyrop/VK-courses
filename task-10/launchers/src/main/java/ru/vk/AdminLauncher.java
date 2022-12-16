@@ -6,7 +6,8 @@ import io.vertx.core.VertxOptions;
 
 public class AdminLauncher {
     public static void main(String[] args) {
-        launchAdminVerticle(1, 6, 3);
+        launchAdminVerticle(1, 3, 2);
+        launchAdminVerticle(2, 6, 1);
     }
 
     private static void launchAdminVerticle(Integer clanId, Integer capacityUser, Integer capacityModerator) {

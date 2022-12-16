@@ -8,7 +8,7 @@ public class ModeratorLauncher {
     public static void main(String[] args) {
         launchModeratorVerticle(1);
         launchModeratorVerticle(1);
-        launchModeratorVerticle(1);
+        launchModeratorVerticle(2);
     }
 
     private static void launchModeratorVerticle(int clanId) {

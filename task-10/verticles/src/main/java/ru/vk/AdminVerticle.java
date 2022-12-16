@@ -31,18 +31,17 @@ public class AdminVerticle extends AbstractVerticle {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
                     this.id = number.result().intValue();
-                    subscribeClanCreation();
-                    addClanModerator();
-                    checkClanUserCapacity();
+                    if (subscribeClanCreation()) {
+                        checkClanUserCapacity().completionHandler(event -> addClanModerator());
+                    }
                 });
             }
         });
     }
 
-    private void subscribeClanCreation() {
+    private Boolean subscribeClanCreation() {
         vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map ->
         {
-            System.out.println(0);
             map.result().entries(clans -> {
                 if (clans.result().containsKey(clanId)) {
                     joinClanAsAdmin();
@@ -51,6 +50,7 @@ public class AdminVerticle extends AbstractVerticle {
                 }
             });
         });
+        return true;
     }
 
     private void joinClanAsAdmin() {
@@ -105,16 +105,17 @@ public class AdminVerticle extends AbstractVerticle {
         });
     }
 
-    private void checkClanUserCapacity() {
-        vertx.eventBus().<Integer>consumer(Paths.CLAN_OVERFLOW.getValue() + clanId, event -> {
+    private MessageConsumer<Integer> checkClanUserCapacity() {
+        return vertx.eventBus().<Integer>consumer(Paths.CLAN_OVERFLOW.getValue() + clanId, event -> {
             vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map -> {
                 map.result().get(clanId, clanData -> {
                     ClanData data = clanData.result();
                     data.setMemberUser(new ArrayList<>());
-                    map.result().put(clanId, data);
-                    System.out.println("Clan " + id + " exiled all users");
-                    vertx.eventBus().publish(Paths.CLAN_REJOIN.getValue() + clanId, null);
-                    System.out.println("Clan " + clanId + " sends rejoin!");
+                    map.result().put(clanId, data, completed -> {
+                        System.out.println("Clan " + id + " exiled all users");
+                        vertx.eventBus().publish(Paths.CLAN_REJOIN.getValue() + clanId, null);
+                        System.out.println("Clan " + clanId + " sends rejoin!");
+                    });
                 });
             });
         });

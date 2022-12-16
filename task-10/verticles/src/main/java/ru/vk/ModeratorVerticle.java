@@ -63,7 +63,7 @@ public class ModeratorVerticle extends AbstractVerticle {
     }
 
     private void acceptUsers() {
-        MessageConsumer<Integer> consumer = vertx.eventBus().<Integer>consumer(Paths.CLAN_MEMBER_JOIN.getValue() + clanId);
+        MessageConsumer<Integer> consumer = vertx.eventBus().consumer(Paths.CLAN_MEMBER_JOIN.getValue() + clanId);
         consumer.handler(event -> {
             consumer.pause();
             Integer userId = event.body();
@@ -73,6 +73,7 @@ public class ModeratorVerticle extends AbstractVerticle {
                     if (data.getMemberUser().size() < data.getCapacityUser()) {
                         List<Integer> userMembers = data.getMemberUser();
                         userMembers.add(userId);
+                        System.out.println(clanId + ": " + userMembers);
                         data.setMemberUser(userMembers);
                         map.result().put(clanId, data, result -> {
                             event.reply("User " + userId + " joined clan " + clanId + ". Accepted by moderator " + id);
