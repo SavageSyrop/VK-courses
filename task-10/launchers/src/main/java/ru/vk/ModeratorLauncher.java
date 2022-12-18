@@ -18,7 +18,7 @@ public class ModeratorLauncher {
                     Vertx vertx = result.result();
                     ModeratorVerticle.Factory factory = new ModeratorVerticle.Factory(clanId);
                     vertx.registerVerticleFactory(factory);
-                    DeploymentOptions options = new DeploymentOptions().setWorker(true);
+                    DeploymentOptions options = new DeploymentOptions();
                     vertx.deployVerticle(factory.prefix() + ":" + ModeratorVerticle.class.getSimpleName(), options, print -> {
                         System.out.println("Moderator deploy result: " + print.succeeded());
                     });

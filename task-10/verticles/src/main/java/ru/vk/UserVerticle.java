@@ -11,6 +11,7 @@ import ru.vk.data.Names;
 import ru.vk.data.Paths;
 import ru.vk.data.UserData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -19,7 +20,8 @@ import java.util.stream.Collectors;
 public class UserVerticle extends AbstractVerticle {
     private int id;
     private UserData userData;
-    private Long messageCounter = null;
+    private Long messageTimerCounter = null;
+    private Long joinTimerCounter = null;
 
     public UserVerticle(int messageTimeout) {
         this.userData = new UserData(null, messageTimeout);
@@ -27,21 +29,27 @@ public class UserVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        vertx.sharedData().getCounter("userCounter", counter -> {
+        vertx.sharedData().getCounter(Names.USER_COUNTER.getValue(), counter -> {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
                     this.id = number.result().intValue();
                     vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map -> {
-                        map.result().entries(clans -> {
-                            if (clans.result().isEmpty()) {
+                        map.result().keys(keys -> {
+                            if (keys.result().isEmpty()) {
                                 System.out.println("There are no clans");
-                                return;
-                            }
-                            List<ClanData> clanDataList = clans.result().values().stream().filter(clanData -> Objects.nonNull(clanData.getAdminId())).collect(Collectors.toList());
-                            if (clanDataList.size() > 0) {
-                                int clanId = clanDataList.get(VertxContextPRNG.current().nextInt(clanDataList.size())).getId();
-                                joinClan(clanId);
-                                rejoinHandler(clanId);
+                                joinTimerCounter = vertx.setPeriodic(userData.getMessageTimeout(), event -> {
+                                    List<Integer> idClans = new ArrayList<>(keys.result());
+                                    if (!idClans.isEmpty()) {
+                                        int clanId = idClans.get(VertxContextPRNG.current().nextInt(idClans.size()));
+                                        joinClan(clanId);
+                                    }
+                                });
+                            } else {
+                                List<Integer> idClans = new ArrayList<>(keys.result());
+                                if (idClans.size() > 0) {
+                                    int clanId = idClans.get(VertxContextPRNG.current().nextInt(idClans.size()));
+                                    joinClan(clanId);
+                                }
                             }
                         });
                     });
@@ -56,24 +64,26 @@ public class UserVerticle extends AbstractVerticle {
 
     private void joinClan(int clanId) {
         System.out.println("User " + id + " tries to join clan " + clanId);
-        if (userData.getClanId() == null) {
-            vertx.eventBus().request(Paths.CLAN_MEMBER_JOIN.getValue() + clanId, id, response -> {
-                if (response.succeeded()) {
-                    userData.setClanId(clanId);
-                    System.out.println(response.result().body());
-                    messageCounter = sendMessageToRandomClanMember();
-                } else {
-                    System.out.println("Unable to join clan " + clanId + " Cause: " + response.cause());
-                    System.out.println("User " + id + " request repeat time: " + userData.getMessageTimeout());
-                    vertx.setPeriodic(userData.getMessageTimeout(), event -> {
-                        if (VertxContextPRNG.current().nextBoolean()) {
-                            joinClan(clanId);
-                            vertx.cancelTimer(event);
-                        }
-                    });
+        vertx.eventBus().request(Paths.CLAN_MEMBER_JOIN.getValue() + clanId, id, response -> {
+            if (response.succeeded()) {
+                System.out.println(response.result().body());
+                userData.setClanId(clanId);
+                if (joinTimerCounter!=null) {
+                    vertx.cancelTimer(joinTimerCounter);
                 }
-            });
-        }
+                messageTimerCounter = sendMessageToRandomClanMember();
+                rejoinHandler(clanId);
+            } else {
+                System.out.println("Unable to join clan " + clanId + " Cause: " + response.cause());
+                System.out.println("User " + id + " request repeat time: " + userData.getMessageTimeout());
+                vertx.setPeriodic(userData.getMessageTimeout(), event -> {
+                    if (VertxContextPRNG.current().nextBoolean()) {
+                        joinClan(clanId);
+                        vertx.cancelTimer(event);
+                    }
+                });
+            }
+        });
     }
 
     private void rejoinHandler(int clanId) {
@@ -86,8 +96,8 @@ public class UserVerticle extends AbstractVerticle {
                     List<ClanData> clanDataList = clans.result().values().stream().filter(cl -> Objects.nonNull(cl.getAdminId())).collect(Collectors.toList());
                     if (clanDataList.size() > 0) {
                         userData.setClanId(null);
-                        if (messageCounter != null) {
-                            vertx.cancelTimer(messageCounter);
+                        if (messageTimerCounter != null) {
+                            vertx.cancelTimer(messageTimerCounter);
                         }
                         vertx.setTimer(userData.getMessageTimeout(), timer -> {
                             int newClanId = clanDataList.get(VertxContextPRNG.current().nextInt(clanDataList.size())).getId();

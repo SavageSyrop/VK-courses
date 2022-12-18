@@ -17,7 +17,7 @@ public class AdminLauncher {
                     Vertx vertx = result.result();
                     AdminVerticle.Factory factory = new AdminVerticle.Factory(clanId, capacityUser, capacityModerator);
                     vertx.registerVerticleFactory(factory);
-                    DeploymentOptions options = new DeploymentOptions().setWorker(true);
+                    DeploymentOptions options = new DeploymentOptions();
                     vertx.deployVerticle(factory.prefix() + ":" + AdminVerticle.class.getSimpleName(), options, print -> {
                         System.out.println("Admin deploy result: " + print.succeeded());
                     });

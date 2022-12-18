@@ -16,7 +16,7 @@ public class ClanLauncher {
                     Vertx vertx = result.result();
                     ClanVerticle.Factory factory = new ClanVerticle.Factory();
                     vertx.registerVerticleFactory(factory);
-                    DeploymentOptions options = new DeploymentOptions().setWorker(true).setInstances(amount);
+                    DeploymentOptions options = new DeploymentOptions().setInstances(amount);
                     vertx.deployVerticle(factory.prefix() + ":" + ClanVerticle.class.getSimpleName(), options, print -> {
                         System.out.println("Clan deploy result: " + print.succeeded());
                     });

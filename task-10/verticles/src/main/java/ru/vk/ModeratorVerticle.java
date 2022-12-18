@@ -22,7 +22,7 @@ public class ModeratorVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        vertx.sharedData().getCounter("moderatorCounter", counter -> {
+        vertx.sharedData().getCounter(Names.MODERATOR_COUNTER.getValue(), counter -> {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
                     this.id = number.result().intValue();
@@ -36,7 +36,7 @@ public class ModeratorVerticle extends AbstractVerticle {
                                 joinClanAsModerator();
                                 acceptUsers();
                             } else {
-                                vertx.eventBus().consumer(Paths.CLAN_SET_ADMIN.getValue() + clanId, event -> {
+                                vertx.eventBus().consumer(Paths.CLAN_SEARCH_FOR_MODERATOR.getValue() + clanId, event -> {
                                     joinClanAsModerator();
                                     acceptUsers();
                                 });

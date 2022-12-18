@@ -1,6 +1,7 @@
 package ru.vk;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -20,21 +21,20 @@ public class ClanVerticle extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> promise) {
-        vertx.sharedData().getCounter("clanCounter", counter -> {
+        vertx.sharedData().getCounter(Names.CLAN_COUNTER.getValue(), counter -> {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
                     this.clanData.setId(number.result().intValue());
                     setAdmin().completionHandler(result -> {
-                        putClanInSharedMap();
-                        vertx.eventBus().publish(Paths.CLAN_CREATED.getValue() + clanData.getId(), null);
-                        if (result.succeeded()) {
+                        if (putClanInSharedMap().succeeded()) {
                             promise.complete();
                         } else {
                             promise.fail(result.cause());
                         }
                     });
-
                 });
+            } else {
+                promise.fail(counter.cause());
             }
         });
     }
@@ -63,16 +63,25 @@ public class ClanVerticle extends AbstractVerticle {
         return consumer;
     }
 
-    private void putClanInSharedMap() {
-        vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map -> {
-            map.result().put(clanData.getId(), clanData, result -> {
-                if (result.succeeded()) {
-                    System.out.println("Clan " + clanData.getId() + " is created!");
-                } else {
-                    System.out.println(-1);
-                }
+    private Future<Void> putClanInSharedMap() {
+        Future<Void> future = Future.future(promise -> {
+            vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map -> {
+                map.result().put(clanData.getId(), clanData, result -> {
+                    if (result.succeeded()) {
+                        System.out.println("Clan " + clanData.getId() + " is created!");
+                        promise.complete();
+                    } else {
+                        System.out.println(-1);
+                        promise.fail(result.cause());
+                    }
+                });
             });
         });
+
+        return future.compose(result -> Future.<Void>future(promise -> {             // TODO понять возвращаемое значение
+            vertx.eventBus().publish(Paths.CLAN_CREATED.getValue() + clanData.getId(), null);
+            promise.complete();
+        }));
     }
 
 

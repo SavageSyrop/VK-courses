@@ -1,6 +1,7 @@
 package ru.vk;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.Verticle;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -27,11 +28,11 @@ public class AdminVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        vertx.sharedData().getCounter("adminCounter", counter -> {
+        vertx.sharedData().getCounter(Names.ADMIN_COUNTER.getValue(), counter -> {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
                     this.id = number.result().intValue();
-                    if (subscribeClanCreation()) {
+                    if (subscribeClanCreation().succeeded()) {
                         checkClanUserCapacity().completionHandler(event -> addClanModerator());
                     }
                 });
@@ -39,18 +40,19 @@ public class AdminVerticle extends AbstractVerticle {
         });
     }
 
-    private Boolean subscribeClanCreation() {
-        vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map ->
-        {
-            map.result().entries(clans -> {
-                if (clans.result().containsKey(clanId)) {
-                    joinClanAsAdmin();
-                } else {
+    private Future<Void> subscribeClanCreation() {
+        return Future.future(promise -> {
+            vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map ->
+            {
+                Future<ClanData> clan = map.result().get(clanId);
+                if (clan == null) {
                     vertx.eventBus().consumer(Paths.CLAN_CREATED.getValue() + clanId, event -> joinClanAsAdmin());
+                } else {
+                    joinClanAsAdmin();
                 }
             });
+            promise.complete();
         });
-        return true;
     }
 
     private void joinClanAsAdmin() {
@@ -63,19 +65,23 @@ public class AdminVerticle extends AbstractVerticle {
                     });
                 });
                 System.out.println(response.result().body());
-                vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map -> {
-                    map.result().entries(data -> {
-                        ClanData clanData = data.result().get(clanId);
+
+                Future<Void> future = Future.future(promise -> vertx.sharedData().<Integer, ClanData>getAsyncMap(Names.CLAN_MAP.getValue(), map -> {
+                    map.result().get(clanId, data -> {
+                        ClanData clanData = data.result();
                         clanData.setCapacityUser(capacityUser);
                         clanData.setCapacityModerator(capacityModerator);
-                        map.result().put(clanId, clanData);
-                        System.out.println("Clan " + clanId + "  user capacity set to: " + capacityUser);
-                        System.out.println("Clan " + clanId + " moderator capacity set to: " + capacityModerator);
+                        map.result().put(clanId, clanData, putResult -> {
+                            System.out.println("Clan " + clanId + "  user capacity set to: " + capacityUser);
+                            System.out.println("Clan " + clanId + " moderator capacity set to: " + capacityModerator);
+                        });
                     });
-                });
-                vertx.eventBus().publish(Paths.CLAN_SET_ADMIN.getValue() + clanId, null);
+                })).compose(result -> Future.<Void>future(promise -> {
+                    vertx.eventBus().publish(Paths.CLAN_SEARCH_FOR_MODERATOR.getValue() + clanId, null);
+                }));
             } else {
                 System.out.println("Failed to join clan: " + response.cause().getMessage());
+                response.failed();
             }
         });
     }

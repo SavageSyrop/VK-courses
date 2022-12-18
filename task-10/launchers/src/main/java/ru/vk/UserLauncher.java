@@ -25,7 +25,7 @@ public class UserLauncher {
                     Vertx vertx = result.result();
                     UserVerticle.Factory factory = new UserVerticle.Factory(messageTimeout);
                     vertx.registerVerticleFactory(factory);
-                    DeploymentOptions options = new DeploymentOptions().setWorker(true);
+                    DeploymentOptions options = new DeploymentOptions();
                     vertx.deployVerticle(factory.prefix() + ":" + UserVerticle.class.getSimpleName(), options, print -> {
                         System.out.println("User deploy result: " + print.succeeded());
                     });
