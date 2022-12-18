@@ -71,7 +71,7 @@ public class ClanVerticle extends AbstractVerticle {
                         System.out.println("Clan " + clanData.getId() + " is created!");
                         promise.complete();
                     } else {
-                        System.out.println(-1);
+                        System.out.println("Failed to put clan in map");
                         promise.fail(result.cause());
                     }
                 });

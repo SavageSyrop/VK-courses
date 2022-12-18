@@ -21,7 +21,7 @@ public class ModeratorVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() {
+    public void start(Promise<Void> promise) {
         vertx.sharedData().getCounter(Names.MODERATOR_COUNTER.getValue(), counter -> {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
@@ -44,6 +44,8 @@ public class ModeratorVerticle extends AbstractVerticle {
                         });
                     });
                 });
+            } else {
+                promise.fail(counter.cause());
             }
         });
     }

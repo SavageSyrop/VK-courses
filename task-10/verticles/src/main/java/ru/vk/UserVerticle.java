@@ -28,7 +28,7 @@ public class UserVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() {
+    public void start(Promise<Void> promise) {
         vertx.sharedData().getCounter(Names.USER_COUNTER.getValue(), counter -> {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
@@ -38,11 +38,16 @@ public class UserVerticle extends AbstractVerticle {
                             if (keys.result().isEmpty()) {
                                 System.out.println("There are no clans");
                                 joinTimerCounter = vertx.setPeriodic(userData.getMessageTimeout(), event -> {
-                                    List<Integer> idClans = new ArrayList<>(keys.result());
-                                    if (!idClans.isEmpty()) {
-                                        int clanId = idClans.get(VertxContextPRNG.current().nextInt(idClans.size()));
-                                        joinClan(clanId);
-                                    }
+                                    map.result().keys(mapKeys -> {
+                                        System.out.println("User " + id + " is trying to find clan");
+                                        List<Integer> idClans = new ArrayList<>(mapKeys.result());
+                                        if (!idClans.isEmpty()) {
+                                            int clanId = idClans.get(VertxContextPRNG.current().nextInt(idClans.size()));
+                                            joinClan(clanId);
+                                        } else {
+                                            System.out.println("");
+                                        }
+                                    });
                                 });
                             } else {
                                 List<Integer> idClans = new ArrayList<>(keys.result());
@@ -58,6 +63,8 @@ public class UserVerticle extends AbstractVerticle {
                         System.out.println("User " + id + " receives message: " + event.body());
                     });
                 });
+            } else {
+                promise.fail(counter.cause());
             }
         });
     }
@@ -98,6 +105,9 @@ public class UserVerticle extends AbstractVerticle {
                         userData.setClanId(null);
                         if (messageTimerCounter != null) {
                             vertx.cancelTimer(messageTimerCounter);
+                        }
+                        if (joinTimerCounter!=null) {
+                            vertx.cancelTimer(joinTimerCounter);
                         }
                         vertx.setTimer(userData.getMessageTimeout(), timer -> {
                             int newClanId = clanDataList.get(VertxContextPRNG.current().nextInt(clanDataList.size())).getId();

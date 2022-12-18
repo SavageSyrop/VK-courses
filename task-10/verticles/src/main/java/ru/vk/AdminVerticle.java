@@ -27,15 +27,19 @@ public class AdminVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() {
+    public void start(Promise<Void> promise) {
         vertx.sharedData().getCounter(Names.ADMIN_COUNTER.getValue(), counter -> {
             if (counter.succeeded()) {
                 counter.result().incrementAndGet(number -> {
                     this.id = number.result().intValue();
                     if (subscribeClanCreation().succeeded()) {
                         checkClanUserCapacity().completionHandler(event -> addClanModerator());
+                    } else  {
+                        promise.fail("Subscription fail");
                     }
                 });
+            } else {
+                promise.fail(counter.cause());
             }
         });
     }
